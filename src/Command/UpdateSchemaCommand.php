@@ -27,7 +27,8 @@ final class UpdateSchemaCommand extends Command
         private readonly ContainerInterface $container,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly EntityManagerInterface $entityManager,
-    ) {
+    )
+    {
         parent::__construct();
     }
 
@@ -42,11 +43,11 @@ final class UpdateSchemaCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $newInput = new ArrayInput([
-            'command' => 'doctrine:schema:update',
-            '--force' => null,
+            'command'    => 'doctrine:schema:update',
+            '--force'    => null,
             '--complete' => null,
-//            '--dump-sql' => null,
-            '--em' => 'tenant'
+            //            '--dump-sql' => null,
+            '--em'       => 'tenant',
         ]);
 
         $singleDbName = $input->getOption('database_id');

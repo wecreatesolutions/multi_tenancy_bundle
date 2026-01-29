@@ -17,15 +17,16 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final class TenantDBALConnectionGenerator implements DoctrineDBALConnectionGeneratorInterface
 {
     private readonly DsnParser $dsnParser;
+
     public function __construct(
         #[Autowire(service: DefaultDsnGenerator::class)]
         private readonly DsnGeneratorInterface $dsnGenerator,
     )
     {
         $this->dsnParser = new DsnParser([
-            'mysql' => 'pdo_mysql',
+            'mysql'      => 'pdo_mysql',
             'postgresql' => 'pdo_pgsql',
-            'sqlite' => 'pdo_sqlite',
+            'sqlite'     => 'pdo_sqlite',
         ]);
     }
 
@@ -34,9 +35,11 @@ final class TenantDBALConnectionGenerator implements DoctrineDBALConnectionGener
      */
     public function generate(TenantConnectionConfigDTO $cfg): Connection
     {
-        return DriverManager::getConnection($this->dsnParser->parse(
-            $this->dsnGenerator->generate($cfg)
-        ));
+        return DriverManager::getConnection(
+            $this->dsnParser->parse(
+                $this->dsnGenerator->generate($cfg)
+            )
+        );
     }
 
     /**
@@ -44,8 +47,10 @@ final class TenantDBALConnectionGenerator implements DoctrineDBALConnectionGener
      */
     public function generateMaintenanceConnection(TenantConnectionConfigDTO $cfg): Connection
     {
-        return DriverManager::getConnection($this->dsnParser->parse(
-            $this->dsnGenerator->generateMaintenanceDsn($cfg)
-        ));
+        return DriverManager::getConnection(
+            $this->dsnParser->parse(
+                $this->dsnGenerator->generateMaintenanceDsn($cfg)
+            )
+        );
     }
 }

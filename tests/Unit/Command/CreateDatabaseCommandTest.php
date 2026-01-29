@@ -9,19 +9,18 @@ use Hakam\MultiTenancyBundle\Enum\DriverTypeEnum;
 use Hakam\MultiTenancyBundle\Port\TenantDatabaseManagerInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Exception;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class CreateDatabaseCommandTest extends TestCase
 {
     private TenantDatabaseManagerInterface $mockManager;
-    private CreateDatabaseCommand $command;
+    private CreateDatabaseCommand          $command;
 
     protected function setUp(): void
     {
         $this->mockManager = $this->createMock(TenantDatabaseManagerInterface::class);
-        $this->command = new CreateDatabaseCommand($this->mockManager);
+        $this->command     = new CreateDatabaseCommand($this->mockManager);
     }
 
     public function testCreateDatabaseWithDbidOption(): void
@@ -29,20 +28,20 @@ class CreateDatabaseCommandTest extends TestCase
         $dbConfig = $this->createTenantConfig(5, DatabaseStatusEnum::DATABASE_NOT_CREATED);
 
         $this->mockManager->expects($this->once())
-            ->method('getTenantDatabaseById')
-            ->with(5)
-            ->willReturn($dbConfig);
+                          ->method('getTenantDatabaseById')
+                          ->with(5)
+                          ->willReturn($dbConfig);
 
         $this->mockManager->expects($this->once())
-            ->method('createTenantDatabase')
-            ->with($dbConfig)
-            ->willReturn(true);
+                          ->method('createTenantDatabase')
+                          ->with($dbConfig)
+                          ->willReturn(true);
 
         $this->mockManager->expects($this->once())
-            ->method('updateTenantDatabaseStatus')
-            ->with(5, DatabaseStatusEnum::DATABASE_CREATED);
+                          ->method('updateTenantDatabaseStatus')
+                          ->with(5, DatabaseStatusEnum::DATABASE_CREATED);
 
-        $input = new ArrayInput(['--dbid' => '5']);
+        $input  = new ArrayInput(['--dbid' => '5']);
         $output = new BufferedOutput();
 
         $result = $this->command->run($input, $output);
@@ -56,14 +55,14 @@ class CreateDatabaseCommandTest extends TestCase
         $dbConfig = $this->createTenantConfig(5, DatabaseStatusEnum::DATABASE_CREATED);
 
         $this->mockManager->expects($this->once())
-            ->method('getTenantDatabaseById')
-            ->with(5)
-            ->willReturn($dbConfig);
+                          ->method('getTenantDatabaseById')
+                          ->with(5)
+                          ->willReturn($dbConfig);
 
         $this->mockManager->expects($this->never())
-            ->method('createTenantDatabase');
+                          ->method('createTenantDatabase');
 
-        $input = new ArrayInput(['--dbid' => '5']);
+        $input  = new ArrayInput(['--dbid' => '5']);
         $output = new BufferedOutput();
 
         $result = $this->command->run($input, $output);
@@ -75,11 +74,11 @@ class CreateDatabaseCommandTest extends TestCase
     public function testCreateDatabaseWithDbidOptionWhenTenantNotFound(): void
     {
         $this->mockManager->expects($this->once())
-            ->method('getTenantDatabaseById')
-            ->with(999)
-            ->willThrowException(new RuntimeException('Tenant database with identifier "999" not found'));
+                          ->method('getTenantDatabaseById')
+                          ->with(999)
+                          ->willThrowException(new RuntimeException('Tenant database with identifier "999" not found'));
 
-        $input = new ArrayInput(['--dbid' => '999']);
+        $input  = new ArrayInput(['--dbid' => '999']);
         $output = new BufferedOutput();
 
         $result = $this->command->run($input, $output);
@@ -96,17 +95,17 @@ class CreateDatabaseCommandTest extends TestCase
         ];
 
         $this->mockManager->expects($this->once())
-            ->method('listMissingDatabases')
-            ->willReturn($dbConfigs);
+                          ->method('listMissingDatabases')
+                          ->willReturn($dbConfigs);
 
         $this->mockManager->expects($this->exactly(2))
-            ->method('createTenantDatabase')
-            ->willReturn(true);
+                          ->method('createTenantDatabase')
+                          ->willReturn(true);
 
         $this->mockManager->expects($this->exactly(2))
-            ->method('updateTenantDatabaseStatus');
+                          ->method('updateTenantDatabaseStatus');
 
-        $input = new ArrayInput(['--all' => true]);
+        $input  = new ArrayInput(['--all' => true]);
         $output = new BufferedOutput();
 
         $result = $this->command->run($input, $output);
@@ -120,10 +119,10 @@ class CreateDatabaseCommandTest extends TestCase
     public function testCreateDatabaseWithAllOptionWhenNoDatabasesToCreate(): void
     {
         $this->mockManager->expects($this->once())
-            ->method('listMissingDatabases')
-            ->willReturn([]);
+                          ->method('listMissingDatabases')
+                          ->willReturn([]);
 
-        $input = new ArrayInput(['--all' => true]);
+        $input  = new ArrayInput(['--all' => true]);
         $output = new BufferedOutput();
 
         $result = $this->command->run($input, $output);
@@ -134,7 +133,7 @@ class CreateDatabaseCommandTest extends TestCase
 
     public function testCreateDatabaseWithBothDbidAndAllOptionsThrowsError(): void
     {
-        $input = new ArrayInput(['--dbid' => '5', '--all' => true]);
+        $input  = new ArrayInput(['--dbid' => '5', '--all' => true]);
         $output = new BufferedOutput();
 
         $result = $this->command->run($input, $output);
@@ -148,14 +147,14 @@ class CreateDatabaseCommandTest extends TestCase
         $dbConfigs = [$this->createTenantConfig(1, DatabaseStatusEnum::DATABASE_NOT_CREATED)];
 
         $this->mockManager->expects($this->once())
-            ->method('listMissingDatabases')
-            ->willReturn($dbConfigs);
+                          ->method('listMissingDatabases')
+                          ->willReturn($dbConfigs);
 
         $this->mockManager->expects($this->once())
-            ->method('createTenantDatabase')
-            ->willReturn(true);
+                          ->method('createTenantDatabase')
+                          ->willReturn(true);
 
-        $input = new ArrayInput([]);
+        $input  = new ArrayInput([]);
         $output = new BufferedOutput();
 
         $result = $this->command->run($input, $output);
@@ -169,14 +168,14 @@ class CreateDatabaseCommandTest extends TestCase
         $dbConfig = $this->createTenantConfig(5, DatabaseStatusEnum::DATABASE_NOT_CREATED);
 
         $this->mockManager->expects($this->once())
-            ->method('getTenantDatabaseById')
-            ->willReturn($dbConfig);
+                          ->method('getTenantDatabaseById')
+                          ->willReturn($dbConfig);
 
         $this->mockManager->expects($this->once())
-            ->method('createTenantDatabase')
-            ->willReturn(false);
+                          ->method('createTenantDatabase')
+                          ->willReturn(false);
 
-        $input = new ArrayInput(['--dbid' => '5']);
+        $input  = new ArrayInput(['--dbid' => '5']);
         $output = new BufferedOutput();
 
         $result = $this->command->run($input, $output);

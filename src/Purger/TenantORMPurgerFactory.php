@@ -14,7 +14,8 @@ final class TenantORMPurgerFactory implements PurgerFactory
         EntityManagerInterface $em,
         array $excluded = [],
         bool $purgeWithTruncate = false
-    ): PurgerInterface {
+    ): PurgerInterface
+    {
         $purger = new ORMPurger($em);
         $purger->setPurgeMode($purgeWithTruncate ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE);
 

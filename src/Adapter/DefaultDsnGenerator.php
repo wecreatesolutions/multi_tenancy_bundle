@@ -20,26 +20,27 @@ final  class DefaultDsnGenerator implements DsnGeneratorInterface
     public function generate(TenantConnectionConfigDTO $cfg): string
     {
         // Generate a db DSN string based on the driver type
-        return match($cfg->driver) {
-            DriverTypeEnum::MYSQL      => $this->generateMysqlDsn($cfg),
+        return match ($cfg->driver) {
+            DriverTypeEnum::MYSQL => $this->generateMysqlDsn($cfg),
             DriverTypeEnum::POSTGRES => $this->generatePgsqlDsn($cfg),
-            DriverTypeEnum::SQLITE     => $this->generateSqliteDsn($cfg),
+            DriverTypeEnum::SQLITE => $this->generateSqliteDsn($cfg),
         };
     }
 
     public function generateMaintenanceDsn(TenantConnectionConfigDTO $cfg): string
     {
         // DSN to connect *to the server* without the tenant DB
-        return match($cfg->driver) {
-            DriverTypeEnum::MYSQL      => $this->generateMysqlMaintenanceDsn($cfg),
+        return match ($cfg->driver) {
+            DriverTypeEnum::MYSQL => $this->generateMysqlMaintenanceDsn($cfg),
             DriverTypeEnum::POSTGRES => $this->generatePgsqlMaintenanceDsn($cfg),
-            DriverTypeEnum::SQLITE     => $this->generateSqliteMaintenanceDsn($cfg),
+            DriverTypeEnum::SQLITE => $this->generateSqliteMaintenanceDsn($cfg),
         };
     }
 
     private function generateMysqlDsn(TenantConnectionConfigDTO $cfg): string
     {
         $pass = $cfg->password ? ':' . $cfg->password : '';
+
         return sprintf(
             'mysql://%s%s@%s:%d/%s',
             $cfg->user, $pass,
@@ -51,6 +52,7 @@ final  class DefaultDsnGenerator implements DsnGeneratorInterface
     private function generateMysqlMaintenanceDsn(TenantConnectionConfigDTO $cfg): string
     {
         $pass = $cfg->password ? ':' . $cfg->password : '';
+
         return sprintf(
             'mysql://%s%s@%s:%d',
             $cfg->user, $pass,
@@ -61,6 +63,7 @@ final  class DefaultDsnGenerator implements DsnGeneratorInterface
     private function generatePgsqlDsn(TenantConnectionConfigDTO $cfg): string
     {
         $pass = $cfg->password ? ':' . $cfg->password : '';
+
         return sprintf(
             'pgsql://%s%s@%s:%d/%s',
             $cfg->user, $pass,
@@ -72,6 +75,7 @@ final  class DefaultDsnGenerator implements DsnGeneratorInterface
     private function generatePgsqlMaintenanceDsn(TenantConnectionConfigDTO $cfg): string
     {
         $pass = $cfg->password ? ':' . $cfg->password : '';
+
         return sprintf(
             'pgsql://%s%s@%s:%d/postgres',
             $cfg->user, $pass,

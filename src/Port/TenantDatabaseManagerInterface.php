@@ -63,11 +63,12 @@ interface TenantDatabaseManagerInterface
     public function addNewTenantDbConfig(TenantConnectionConfigDTO $dto): TenantConnectionConfigDTO;
 
     // update Db Status
+
     /**
      * Update the status of a tenant database.
      *
-     * @param mixed $identifier The identifier of the tenant database to update.
-     * @param DatabaseStatusEnum $status The new status to set for the tenant database.
+     * @param mixed              $identifier The identifier of the tenant database to update.
+     * @param DatabaseStatusEnum $status     The new status to set for the tenant database.
      * @return bool True if the status was updated successfully, false otherwise.
      */
     public function updateTenantDatabaseStatus(mixed $identifier, DatabaseStatusEnum $status): bool;

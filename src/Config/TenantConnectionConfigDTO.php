@@ -11,27 +11,27 @@ use Hakam\MultiTenancyBundle\Enum\DriverTypeEnum;
 class TenantConnectionConfigDTO
 {
     private function __construct(
-        public mixed              $identifier,
-        public DriverTypeEnum     $driver,
+        public mixed $identifier,
+        public DriverTypeEnum $driver,
         public DatabaseStatusEnum $dbStatus,
-        public string             $host,
-        public int                $port,
-        public string             $dbname,
-        public string             $user,
-        public ?string            $password = null
+        public string $host,
+        public int $port,
+        public string $dbname,
+        public string $user,
+        public ?string $password = null
     )
     {
     }
 
     public static function fromArgs(
-        mixed              $identifier,
-        DriverTypeEnum     $driver,
+        mixed $identifier,
+        DriverTypeEnum $driver,
         DatabaseStatusEnum $dbStatus,
-        string             $host,
-        int                $port,
-        string             $dbname,
-        string             $user,
-        ?string            $password = null
+        string $host,
+        int $port,
+        string $dbname,
+        string $user,
+        ?string $password = null
     ): self
     {
         return new self($identifier, $driver, $dbStatus, $host, $port, $dbname, $user, $password);

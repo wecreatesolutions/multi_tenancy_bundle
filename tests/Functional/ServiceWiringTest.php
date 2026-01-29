@@ -22,37 +22,37 @@ class ServiceWiringTest extends TestCase
         $config = [
             'tenant_database_identifier' => 'id',
 
-            'tenant_connection' => [
-                'host' => '127.0.0.1',
-                'driver' => 'pdo_mysql',
-                'charset' => 'utf8',
-                'dbname' => 'tenant0',
-                'user' => 'root',
-                'password' => null
+            'tenant_connection'     => [
+                'host'     => '127.0.0.1',
+                'driver'   => 'pdo_mysql',
+                'charset'  => 'utf8',
+                'dbname'   => 'tenant0',
+                'user'     => 'root',
+                'password' => null,
             ],
-            'tenant_migration' =>
+            'tenant_migration'      =>
                 [
                     'tenant_migration_namespace' => 'Test\Application\Migrations\Tenant',
-                    'tenant_migration_path' => 'tests/migrations/Tenant'
+                    'tenant_migration_path'      => 'tests/migrations/Tenant',
                 ],
             'tenant_entity_manager' =>
                 [
                     'tenant_naming_strategy' => 'doctrine.orm.naming_strategy.default',
-                    'dql' =>
+                    'dql'                    =>
                         [
                             'string_functions' =>
                                 [
-                                    'FIELD' => 'Tenant\Functions\FieldFunction'
-                                ]
+                                    'FIELD' => 'Tenant\Functions\FieldFunction',
+                                ],
                         ],
-                    'mapping' =>
+                    'mapping'                =>
                         [
-                            'type' => 'attribute',
-                            'dir' => '%kernel.project_dir%/tests',
+                            'type'   => 'attribute',
+                            'dir'    => '%kernel.project_dir%/tests',
                             'prefix' => 'Tenant',
-                            'alias' => 'Tenant'
-                        ]
-                ]
+                            'alias'  => 'Tenant',
+                        ],
+                ],
         ];
         $kernel = new MultiTenancyBundleTestingKernel($config);
         $kernel->boot();

@@ -25,7 +25,7 @@ class MultiTenancyBundleTestingKernel extends Kernel
         return [
             new DoctrineBundle(),
             new DoctrineMigrationsBundle(),
-            new HakamMultiTenancyBundle()
+            new HakamMultiTenancyBundle(),
         ];
     }
 

@@ -27,14 +27,13 @@ use Throwable;
 )]
 final class MigrateCommand extends TenantCommand
 {
-
-    const MIGRATE_TYPE_INIT = 'init';
-    const MIGRATE_TYPE_UPDATE = 'update';
+    public const string MIGRATE_TYPE_INIT   = 'init';
+    public const string MIGRATE_TYPE_UPDATE = 'update';
 
     public function __construct(
-        private readonly ManagerRegistry                $registry,
-        private readonly ContainerInterface             $container,
-        private readonly EventDispatcherInterface       $eventDispatcher,
+        private readonly ManagerRegistry $registry,
+        private readonly ContainerInterface $container,
+        private readonly EventDispatcherInterface $eventDispatcher,
         private readonly TenantDatabaseManagerInterface $tenantDatabaseManager,
     )
     {
@@ -57,9 +56,9 @@ final class MigrateCommand extends TenantCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $dbId = $input->getArgument('dbId');
+        $dbId          = $input->getArgument('dbId');
         $migrationType = $input->getArgument('type');
-        $io = new SymfonyStyle($input, $output);
+        $io            = new SymfonyStyle($input, $output);
 
         if ($dbId !== null) {
             $io->warning('DEPRECATION: The "dbId" argument is deprecated and will be removed in v4.0.');
@@ -71,18 +70,20 @@ final class MigrateCommand extends TenantCommand
 
                 if ($migrationType === self::MIGRATE_TYPE_INIT && $tenantDb->dbStatus !== DatabaseStatusEnum::DATABASE_CREATED) {
                     $io->error(sprintf('Database "%s" is not in CREATED status. Current status: %s', $dbId, $tenantDb->dbStatus->value));
+
                     return 1;
                 }
 
                 if ($migrationType === self::MIGRATE_TYPE_UPDATE && $tenantDb->dbStatus !== DatabaseStatusEnum::DATABASE_MIGRATED) {
                     $io->error(sprintf('Database "%s" is not in MIGRATED status. Current status: %s', $dbId, $tenantDb->dbStatus->value));
+
                     return 1;
                 }
 
                 return $this->migrateSingleDB($input, $output, $io, $tenantDb);
-
             } catch (\RuntimeException $e) {
                 $io->error(sprintf('Tenant database with identifier "%s" not found: %s', $dbId, $e->getMessage()));
+
                 return 1;
             }
         }
@@ -100,12 +101,13 @@ final class MigrateCommand extends TenantCommand
                 break;
             default:
                 $io->error('Invalid migration type');
+
                 return 1;
         }
         $io->progressStart(count($listOfDbsToMigrate));
         $io->newLine();
         /**
-         * @var int $kay
+         * @var int                         $kay
          * @var   TenantConnectionConfigDTO $db
          */
         foreach ($listOfDbsToMigrate as $kay => $db) {
@@ -125,12 +127,14 @@ final class MigrateCommand extends TenantCommand
             } catch (Throwable $e) {
                 $io->newLine();
                 $io->error($e->getMessage());
+
                 return 1;
             }
         }
         $io->progressFinish();
         $io->newLine();
         $io->success('All databases migrated successfully');
+
         return 0;
     }
 
@@ -140,9 +144,9 @@ final class MigrateCommand extends TenantCommand
     private function runMigrateCommand(InputInterface $input, OutputInterface $output): void
     {
         $newInput = new ArrayInput([
-            'version' => $input->getArgument('version'),
-            '--dry-run' => $input->getOption('dry-run'),
-            '--query-time' => $input->getOption('query-time'),
+            'version'              => $input->getArgument('version'),
+            '--dry-run'            => $input->getOption('dry-run'),
+            '--query-time'         => $input->getOption('query-time'),
             '--allow-no-migration' => $input->getOption('allow-no-migration'),
         ]);
         $newInput->setInteractive($input->isInteractive());
@@ -154,25 +158,31 @@ final class MigrateCommand extends TenantCommand
     {
         try {
             // we already checked that dbId is not null or add it  in the loop
-            $io->note(sprintf('Start Migrating database with identifier "%s" (Database: %s, Host: %s)', 
-                $tenantDb->identifier, $tenantDb->dbname, $tenantDb->host));
+            $io->note(
+                sprintf(
+                    'Start Migrating database with identifier "%s" (Database: %s, Host: %s)',
+                    $tenantDb->identifier, $tenantDb->dbname, $tenantDb->host
+                )
+            );
             $io->newLine();
-            
+
             $this->runMigrateCommand($input, $output);
-            
+
             // Update database status if this was an init migration
             if ($tenantDb->dbStatus === DatabaseStatusEnum::DATABASE_CREATED) {
                 $this->tenantDatabaseManager->updateTenantDatabaseStatus(
-                    $tenantDb->identifier, 
+                    $tenantDb->identifier,
                     DatabaseStatusEnum::DATABASE_MIGRATED
                 );
                 $this->registry->getManager()->flush();
             }
-            
+
             $io->success(sprintf('Database with identifier "%s" migrated successfully.', $tenantDb->identifier));
+
             return 0;
         } catch (Throwable $e) {
             $io->error(sprintf('Failed to migrate database with identifier "%s": %s', $tenantDb->identifier, $e->getMessage()));
+
             return 1;
         }
     }

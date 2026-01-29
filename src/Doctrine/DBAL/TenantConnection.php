@@ -27,18 +27,19 @@ class TenantConnection extends Connection
     {
         $this->close();
         $this->_conn = property_exists($this, 'driver') ? $this->driver->connect($params) : $this->_driver->connect($params);
-        
+
         $this->isConnected = true;
-        
+
         if ($this->autoCommit === false) {
             $this->beginTransaction();
         }
+
         return true;
     }
 
     public function close(): void
     {
-        $this->_conn = null;
+        $this->_conn       = null;
         $this->isConnected = false;
     }
 }

@@ -19,14 +19,15 @@ class DoctrineTenantDatabaseManager implements TenantDatabaseManagerInterface
     private readonly ObjectRepository $tenantDatabaseRepository;
 
     public function __construct(
-        private readonly EntityManagerInterface                   $entityManager,
+        private readonly EntityManagerInterface $entityManager,
         #[Autowire(service: TenantDBALConnectionGenerator::class)]
         private readonly DoctrineDBALConnectionGeneratorInterface $doctrineDBALConnectionGenerator,
         #[Autowire('%hakam.tenant_db_list_entity%')]
-        private readonly string                                   $tenantDbEntityClassName,
+        private readonly string $tenantDbEntityClassName,
         #[Autowire('%hakam.tenant_db_identifier%')]
-        private readonly string                                   $tenantDbIdentifier
-    ) {
+        private readonly string $tenantDbIdentifier
+    )
+    {
         $this->tenantDatabaseRepository = $this->entityManager->getRepository($this->tenantDbEntityClassName);
     }
 
@@ -36,6 +37,7 @@ class DoctrineTenantDatabaseManager implements TenantDatabaseManagerInterface
         if (count($databases) === 0) {
             throw new RuntimeException(sprintf('No tenant databases found in repository "%s"', get_class($this->tenantDatabaseRepository)));
         }
+
         return
             array_map(
                 fn($db) => $this->convertToDTO($db),
@@ -49,6 +51,7 @@ class DoctrineTenantDatabaseManager implements TenantDatabaseManagerInterface
         if (count($databases) === 0) {
             throw new RuntimeException(sprintf('No tenant databases found in repository "%s"', get_class($this->tenantDatabaseRepository)));
         }
+
         return
             array_map(
                 fn($db) => $this->convertToDTO($db),
@@ -62,6 +65,7 @@ class DoctrineTenantDatabaseManager implements TenantDatabaseManagerInterface
         if (count($databases) === 0) {
             throw new RuntimeException(sprintf('No tenant databases found in repository "%s" with status "%s"', get_class($this->tenantDatabaseRepository), $status->value));
         }
+
         return
             array_map(
                 fn($db) => $this->convertToDTO($db),
@@ -75,6 +79,7 @@ class DoctrineTenantDatabaseManager implements TenantDatabaseManagerInterface
         if (null === $tenantDbConfig) {
             throw new RuntimeException(sprintf('Tenant database with identifier "%s" not found in repository "%s"', $identifier, get_class($this->tenantDatabaseRepository)));
         }
+
         return $this->convertToDTO($tenantDbConfig);
     }
 
@@ -84,6 +89,7 @@ class DoctrineTenantDatabaseManager implements TenantDatabaseManagerInterface
         if (null === $tenantDbConfig) {
             throw new RuntimeException(sprintf('No default tenant database found in repository "%s"', get_class($this->tenantDatabaseRepository)));
         }
+
         return $this->convertToDTO($tenantDbConfig);
     }
 
@@ -94,18 +100,21 @@ class DoctrineTenantDatabaseManager implements TenantDatabaseManagerInterface
     {
         try {
             $tenantConnection = $this->doctrineDBALConnectionGenerator->generateMaintenanceConnection($tenantConnectionConfigDTO);
-            $schemaManager = method_exists($tenantConnection, 'createSchemaManager')
+            $schemaManager    = method_exists($tenantConnection, 'createSchemaManager')
                 ? $tenantConnection->createSchemaManager()
                 : $tenantConnection->getSchemaManager();
             $schemaManager->createDatabase($tenantConnectionConfigDTO->dbname);
             $tenantConnection->close();
+
             return 1;
         } catch (Throwable $e) {
-            throw new MultiTenancyException(sprintf(
-                'Unable to create new tenant database %s: %s',
-                $tenantConnectionConfigDTO->dbname,
-                $e->getMessage()
-            ), $e->getCode(), $e);
+            throw new MultiTenancyException(
+                sprintf(
+                    'Unable to create new tenant database %s: %s',
+                    $tenantConnectionConfigDTO->dbname,
+                    $e->getMessage()
+                ), $e->getCode(), $e
+            );
         }
     }
 
@@ -118,6 +127,7 @@ class DoctrineTenantDatabaseManager implements TenantDatabaseManagerInterface
         $tenantDbConfig->setDatabaseStatus($status);
         $this->entityManager->persist($tenantDbConfig);
         $this->entityManager->flush();
+
         return true;
     }
 
@@ -137,7 +147,6 @@ class DoctrineTenantDatabaseManager implements TenantDatabaseManagerInterface
 
         return $this->convertToDTO($dbConfig);
     }
-
 
     private function convertToDTO(TenantDbConfigurationInterface $dbConfig): TenantConnectionConfigDTO
     {

@@ -16,7 +16,7 @@ class FixtureTaggingPass implements CompilerPassInterface
 
         foreach ($taggedServiceIds as $id => $tags) {
             $definition = $container->getDefinition($id);
-            $class = $definition->getClass();
+            $class      = $definition->getClass();
 
             if (!$class || !class_exists($class)) {
                 continue;

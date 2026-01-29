@@ -8,6 +8,7 @@ use Hakam\MultiTenancyBundle\Enum\DriverTypeEnum;
 
 /**
  *  Trait to add tenant database configuration to an entity.
+ *
  * @author Ramy Hakam <pencilsoft1@gmail.com>
  */
 trait TenantDbConfigTrait
@@ -48,6 +49,7 @@ trait TenantDbConfigTrait
     public function setDbName(string $dbName): self
     {
         $this->dbName = $dbName;
+
         return $this;
     }
 
@@ -59,6 +61,7 @@ trait TenantDbConfigTrait
     public function setDriverType(DriverTypeEnum $driverType): self
     {
         $this->driverType = $driverType;
+
         return $this;
     }
 
@@ -77,6 +80,7 @@ trait TenantDbConfigTrait
     public function setDbUserName(?string $dbUser = null): self
     {
         $this->dbUserName = $dbUser;
+
         return $this;
     }
 
@@ -95,6 +99,7 @@ trait TenantDbConfigTrait
     public function setDbPassword(?string $dbPassword): self
     {
         $this->dbPassword = $dbPassword;
+
         return $this;
     }
 
@@ -113,6 +118,7 @@ trait TenantDbConfigTrait
     public function setDatabaseStatus(DatabaseStatusEnum $databaseStatus): self
     {
         $this->databaseStatus = $databaseStatus;
+
         return $this;
     }
 
@@ -123,6 +129,7 @@ trait TenantDbConfigTrait
     public function setDbHost(?string $dbHost): self
     {
         $this->dbHost = $dbHost;
+
         return $this;
     }
 
@@ -141,6 +148,7 @@ trait TenantDbConfigTrait
     public function setDbPort(?int $dbPort): self
     {
         $this->dbPort = $dbPort;
+
         return $this;
     }
 
@@ -154,9 +162,9 @@ trait TenantDbConfigTrait
 
     public function getDsnUrl(): string
     {
-        $dbDriver = $this->getDriverType()->value ?: DriverTypeEnum::MYSQL->value;
-        $dbHost = $this->getDbHost() ?: '127.0.0.1';
-        $dbPort = $this->getDbPort() ?: 3306;
+        $dbDriver   = $this->getDriverType()->value ?: DriverTypeEnum::MYSQL->value;
+        $dbHost     = $this->getDbHost() ?: '127.0.0.1';
+        $dbPort     = $this->getDbPort() ?: 3306;
         $dbUsername = $this->getDbUsername();
         $dbPassword = $this->getDbPassword() ? ':' . $this->getDbPassword() : '';
 

@@ -2,23 +2,23 @@
 
 namespace Hakam\MultiTenancyBundle\Tests\Unit\Adapter\Doctrine;
 
-use Hakam\MultiTenancyBundle\Enum\DatabaseStatusEnum;
-use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Connection;
 use Hakam\MultiTenancyBundle\Adapter\Doctrine\TenantDBALConnectionGenerator;
-use Hakam\MultiTenancyBundle\Port\DsnGeneratorInterface;
 use Hakam\MultiTenancyBundle\Config\TenantConnectionConfigDTO;
+use Hakam\MultiTenancyBundle\Enum\DatabaseStatusEnum;
 use Hakam\MultiTenancyBundle\Enum\DriverTypeEnum;
+use Hakam\MultiTenancyBundle\Port\DsnGeneratorInterface;
+use PHPUnit\Framework\TestCase;
 
 class TenantDBALConnectionGeneratorTest extends TestCase
 {
     private TenantDBALConnectionGenerator $generator;
-    private DsnGeneratorInterface $dsnGenerator;
+    private DsnGeneratorInterface         $dsnGenerator;
 
     protected function setUp(): void
     {
         $this->dsnGenerator = $this->createMock(DsnGeneratorInterface::class);
-        $this->generator = new TenantDBALConnectionGenerator($this->dsnGenerator);
+        $this->generator    = new TenantDBALConnectionGenerator($this->dsnGenerator);
     }
 
     public function testGenerateReturnsSqliteMemoryConnection(): void

@@ -8,7 +8,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -21,8 +21,12 @@ class HakamMultiTenancyExtension extends Extension implements PrependExtensionIn
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load('services.xml');
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.yaml');
+
+        if (!class_exists('Doctrine\\Bundle\\FixturesBundle\\Purger\\PurgerFactory')) {
+            $container->removeDefinition('hakam.tenant_purger_factory');
+        }
 
         $configuration = $this->getConfiguration($configs, $container);
 
@@ -46,37 +50,44 @@ class HakamMultiTenancyExtension extends Extension implements PrependExtensionIn
 
     public function prepend(ContainerBuilder $container): void
     {
-        $configs = $container->getExtensionConfig($this->getAlias());
+        $configs          = $container->getExtensionConfig($this->getAlias());
         $dbSwitcherConfig = $this->processConfiguration(new Configuration(), $configs);
         if (6 === count($dbSwitcherConfig)) {
             $bundles = $container->getParameter('kernel.bundles');
 
             $this->checkDir($container->getParameter('kernel.project_dir'), $dbSwitcherConfig['tenant_entity_manager']['mapping']['dir']);
 
-            $tenantConnectionConfig = [
+            // fix - don't allow url and host and port to be defined
+            $tenantConnection = [
+                'driver'         => $dbSwitcherConfig['tenant_connection']['driver'],
+                'charset'        => $dbSwitcherConfig['tenant_connection']['charset'],
+                'server_version' => $dbSwitcherConfig['tenant_connection']['server_version'],
+                'wrapper_class'  => TenantConnection::class,
+            ];
+
+            if (!empty($dbSwitcherConfig['tenant_connection']['url'])) {
+                $tenantConnection['url'] = $dbSwitcherConfig['tenant_connection']['url'];
+            } else {
+                $tenantConnection['host'] = $dbSwitcherConfig['tenant_connection']['host'];
+                $tenantConnection['port'] = $dbSwitcherConfig['tenant_connection']['port'];
+            }
+
+            $tenantConnectionConfig    = [
                 'connections' => [
-                    'tenant' => [
-                        'driver' => $dbSwitcherConfig['tenant_connection']['driver'],
-                        'url' => $dbSwitcherConfig['tenant_connection']['url'],
-                        'host' => $dbSwitcherConfig['tenant_connection']['host'],
-                        'port' => $dbSwitcherConfig['tenant_connection']['port'],
-                        'charset' => $dbSwitcherConfig['tenant_connection']['charset'],
-                        'server_version' => $dbSwitcherConfig['tenant_connection']['server_version'],
-                        'wrapper_class' => TenantConnection::class,
-                    ],
+                    'tenant' => $tenantConnection,
                 ],
             ];
             $tenantEntityManagerConfig = [
                 'entity_managers' => [
                     'tenant' => [
-                        'connection' => 'tenant',
+                        'connection'      => 'tenant',
                         'naming_strategy' => $dbSwitcherConfig['tenant_entity_manager']['tenant_naming_strategy'],
-                        'mappings' => [
+                        'mappings'        => [
                             'HakamMultiTenancyBundle' => [
-                                'type' => $dbSwitcherConfig['tenant_entity_manager']['mapping']['type'],
-                                'dir' => $dbSwitcherConfig['tenant_entity_manager']['mapping']['dir'],
-                                'prefix' => $dbSwitcherConfig['tenant_entity_manager']['mapping']['prefix'] ?? null,
-                                'alias' => $dbSwitcherConfig['tenant_entity_manager']['mapping']['alias'] ?? null,
+                                'type'      => $dbSwitcherConfig['tenant_entity_manager']['mapping']['type'],
+                                'dir'       => $dbSwitcherConfig['tenant_entity_manager']['mapping']['dir'],
+                                'prefix'    => $dbSwitcherConfig['tenant_entity_manager']['mapping']['prefix'] ?? null,
+                                'alias'     => $dbSwitcherConfig['tenant_entity_manager']['mapping']['alias'] ?? null,
                                 'is_bundle' => $dbSwitcherConfig['tenant_entity_manager']['mapping']['is_bundle'] ?? true,
                             ],
                         ],
@@ -109,8 +120,8 @@ class HakamMultiTenancyExtension extends Extension implements PrependExtensionIn
     private function checkDir(string $projectDir, string $dir): void
     {
         $fileSystem = new Filesystem();
-        $dir = str_replace('%kernel.project_dir%', '', $dir);
-        $dir = sprintf("%s/%s", $projectDir, $dir);
+        $dir        = str_replace('%kernel.project_dir%', '', $dir);
+        $dir        = sprintf("%s/%s", $projectDir, $dir);
         if (!$fileSystem->exists($dir)) {
             $fileSystem->mkdir($dir);
         }

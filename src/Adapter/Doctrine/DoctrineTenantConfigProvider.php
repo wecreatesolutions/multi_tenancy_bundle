@@ -34,14 +34,14 @@ class DoctrineTenantConfigProvider implements TenantConfigProviderInterface
         }
 
         return TenantConnectionConfigDTO::fromArgs(
-                identifier: $tenantDbConfig->getId() ?? null,
-                driver: $tenantDbConfig->getDriverType(),
-                dbStatus: $tenantDbConfig->getDatabaseStatus(),
-                host: $tenantDbConfig->getDbHost(),
-                port: $tenantDbConfig->getDbPort(),
-                dbname : $tenantDbConfig->getDbName(),
-                user: $tenantDbConfig->getDbUserName(),
-                password: $tenantDbConfig->getDbPassword()
+            identifier: $tenantDbConfig->getId() ?? null,
+            driver: $tenantDbConfig->getDriverType(),
+            dbStatus: $tenantDbConfig->getDatabaseStatus(),
+            host: $tenantDbConfig->getDbHost(),
+            port: $tenantDbConfig->getDbPort(),
+            dbname: $tenantDbConfig->getDbName(),
+            user: $tenantDbConfig->getDbUserName(),
+            password: $tenantDbConfig->getDbPassword()
         );
     }
 }

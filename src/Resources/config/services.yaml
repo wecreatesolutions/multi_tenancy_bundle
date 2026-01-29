@@ -1,0 +1,122 @@
+services:
+  hakam_tenant_config_provider.doctrine:
+    class: Hakam\MultiTenancyBundle\Adapter\Doctrine\DoctrineTenantConfigProvider
+    public: false
+    autowire: true
+    autoconfigure: true
+    arguments:
+      $entityManager: '@doctrine.orm.entity_manager'
+      $dbClassName: 'dbClassName'
+      $dbIdentifier: 'id'
+
+  Hakam\MultiTenancyBundle\Adapter\Doctrine\DoctrineTenantConfigProvider:
+    alias: hakam_tenant_config_provider.doctrine
+    public: false
+
+  Hakam\MultiTenancyBundle\Port\TenantConfigProviderInterface:
+    alias: Hakam\MultiTenancyBundle\Adapter\Doctrine\DoctrineTenantConfigProvider
+    public: false
+
+  hakam_tenant_fixtures_loader.service:
+    class: Hakam\MultiTenancyBundle\Services\TenantFixtureLoader
+    public: false
+    arguments:
+      - !tagged_iterator tenant_fixture
+
+  Hakam\MultiTenancyBundle\Services\TenantFixtureLoader:
+    alias: hakam_tenant_fixtures_loader.service
+    public: false
+
+  # seems like "DoctrineTenantDatabaseManager" can be used for these methods
+  #  Hakam\MultiTenancyBundle\Services\DbService:
+  #    public: false
+  #    autowire: true
+
+  Hakam\MultiTenancyBundle\Adapter\DefaultDsnGenerator:
+    public: false
+    autowire: true
+
+  Hakam\MultiTenancyBundle\Adapter\Doctrine\TenantDBALConnectionGenerator:
+    public: false
+    autowire: true
+    autoconfigure: true
+
+  Hakam\MultiTenancyBundle\Adapter\Doctrine\DoctrineTenantDatabaseManager:
+    public: false
+    autowire: true
+
+  Hakam\MultiTenancyBundle\Port\TenantDatabaseManagerInterface:
+    alias: Hakam\MultiTenancyBundle\Adapter\Doctrine\DoctrineTenantDatabaseManager
+    public: false
+
+  Hakam\MultiTenancyBundle\EventListener\DbSwitchEventListener:
+    arguments:
+      - '@service_container'
+      - '@Hakam\MultiTenancyBundle\Port\TenantConfigProviderInterface'
+      - '@tenant_entity_manager'
+      - '%env(DATABASE_URL)%'
+    tags:
+      - { name: kernel.event_listener, event: Hakam\MultiTenancyBundle\Event\SwitchDbEvent }
+
+  Hakam\MultiTenancyBundle\Command\DiffCommand:
+    arguments:
+      - '@Doctrine\Persistence\ManagerRegistry'
+      - '@service_container'
+      - '@event_dispatcher'
+      - '@Hakam\MultiTenancyBundle\Port\TenantDatabaseManagerInterface'
+    tags:
+      - { name: console.command }
+
+  Symfony\Component\Console\Application:
+    public: true
+
+  Hakam\MultiTenancyBundle\Command\CreateDatabaseCommand:
+    arguments:
+      - '@Hakam\MultiTenancyBundle\Port\TenantDatabaseManagerInterface'
+    tags:
+      - { name: console.command }
+
+  Hakam\MultiTenancyBundle\Command\MigrateCommand:
+    arguments:
+      - '@Doctrine\Persistence\ManagerRegistry'
+      - '@service_container'
+      - '@event_dispatcher'
+      - '@Hakam\MultiTenancyBundle\Port\TenantDatabaseManagerInterface'
+    tags:
+      - { name: console.command }
+
+  Hakam\MultiTenancyBundle\Command\LoadTenantFixtureCommand:
+    arguments:
+      - '@Doctrine\Persistence\ManagerRegistry'
+      - '@service_container'
+      - '@event_dispatcher'
+      - '@hakam_tenant_fixtures_loader.service'
+      - !tagged_iterator { tag: doctrine.fixtures.purger_factory, index_by: alias }
+    tags:
+      - { name: console.command }
+
+  Hakam\MultiTenancyBundle\Command\UpdateSchemaCommand:
+    arguments:
+      - '@service_container'
+      - '@event_dispatcher'
+      - '@Doctrine\ORM\EntityManagerInterface'
+    tags:
+      - { name: console.command }
+
+  tenant_db_interface:
+    class: Hakam\MultiTenancyBundle\Services\TenantDbConfigurationInterface
+    public: true
+
+  tenant_entity_manager:
+    class: Hakam\MultiTenancyBundle\Doctrine\ORM\TenantEntityManager
+    public: true
+    arguments:
+      - '@doctrine.orm.tenant_entity_manager'
+
+  Hakam\MultiTenancyBundle\Doctrine\ORM\TenantEntityManager:
+    alias: tenant_entity_manager
+
+  hakam.tenant_purger_factory:
+    class: Hakam\MultiTenancyBundle\Purger\TenantORMPurgerFactory
+    tags:
+      - { name: doctrine.fixtures.purger_factory, alias: tenant_default }

@@ -23,7 +23,8 @@ final class CreateDatabaseCommand extends Command
 
     public function __construct(
         private readonly TenantDatabaseManagerInterface $tenantDatabaseManager
-    ) {
+    )
+    {
         parent::__construct();
     }
 
@@ -41,18 +42,21 @@ final class CreateDatabaseCommand extends Command
     {
         try {
             $dbId = $input->getOption('dbid');
-            $all = $input->getOption('all');
+            $all  = $input->getOption('all');
 
             if ($dbId && $all) {
                 $output->writeln('Cannot use --dbid and --all options together');
+
                 return 1;
             }
             if ($dbId) {
-                return $this->createDatabaseById((int) $dbId, $output);
+                return $this->createDatabaseById((int)$dbId, $output);
             }
+
             return $this->createAllMissingDatabases($output);
         } catch (Exception $e) {
             $output->writeln(sprintf('Failed to create database: %s', $e->getMessage()));
+
             return 1;
         }
     }
@@ -63,6 +67,7 @@ final class CreateDatabaseCommand extends Command
             $listOfNewDbs = $this->tenantDatabaseManager->listMissingDatabases();
             if (empty($listOfNewDbs)) {
                 $output->writeln('No new databases to create');
+
                 return 0;
             }
             foreach ($listOfNewDbs as $newDb) {
@@ -74,15 +79,16 @@ final class CreateDatabaseCommand extends Command
                 $this->tenantDatabaseManager->updateTenantDatabaseStatus($newDb->identifier, DatabaseStatusEnum::DATABASE_CREATED);
             }
             $output->writeln('The new List of Databases created successfully');
+
             return 0;
         } catch (Exception $e) {
             $output->writeln($e->getMessage());
+
             return 1;
         }
     }
 
-
-    private function createDatabaseById(int $dbId, OutputInterface $output): int
+    private function createDatabaseById(string $dbId, OutputInterface $output): int
     {
         try {
             $dbConfig = $this->tenantDatabaseManager->getTenantDatabaseById($dbId);
@@ -91,17 +97,20 @@ final class CreateDatabaseCommand extends Command
                 $dbConfig->dbStatus === DatabaseStatusEnum::DATABASE_MIGRATED
             ) {
                 $output->writeln(sprintf('Database %s already exists', $dbConfig->dbname));
+
                 return 0;
             }
             $databaseCreated = $this->createDatabase($dbConfig, $output);
             if (!$databaseCreated) {
-                throw new MultiTenancyException(sprintf('Failed to create database %s', $dbConfig->dbname, $dbId));
+                throw new MultiTenancyException(sprintf('Failed to create database %s for tenant ID %d', $dbConfig->dbname, $dbId));
             }
             $output->writeln(sprintf('Database %s created successfully for tenant ID %d', $dbConfig->dbname, $dbId));
             $this->tenantDatabaseManager->updateTenantDatabaseStatus($dbId, DatabaseStatusEnum::DATABASE_CREATED);
+
             return 0;
         } catch (Exception $e) {
             $output->writeln(sprintf('Failed to create database for tenant ID %d: %s', $dbId, $e->getMessage()));
+
             return 1;
         }
     }

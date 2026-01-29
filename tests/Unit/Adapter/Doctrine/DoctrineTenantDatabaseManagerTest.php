@@ -18,23 +18,23 @@ use RuntimeException;
 
 class DoctrineTenantDatabaseManagerTest extends TestCase
 {
-    private EntityManagerInterface $em;
-    private ObjectRepository $repo;
+    private EntityManagerInterface                   $em;
+    private ObjectRepository                         $repo;
     private DoctrineDBALConnectionGeneratorInterface $connGen;
-    private DoctrineTenantDatabaseManager $manager;
-    private const ENTITY_CLASS = 'TenantDbConfig';
+    private DoctrineTenantDatabaseManager            $manager;
+    private const ENTITY_CLASS     = 'TenantDbConfig';
     private const IDENTIFIER_FIELD = 'id';
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManagerInterface::class);
-        $this->repo = $this->createMock(EntityRepository::class);
+        $this->em      = $this->createMock(EntityManagerInterface::class);
+        $this->repo    = $this->createMock(EntityRepository::class);
         $this->connGen = $this->createMock(DoctrineDBALConnectionGeneratorInterface::class);
 
         // stub getRepository
         $this->em->method('getRepository')
-            ->with(self::ENTITY_CLASS)
-            ->willReturn($this->repo);
+                 ->with(self::ENTITY_CLASS)
+                 ->willReturn($this->repo);
 
         $this->manager = new DoctrineTenantDatabaseManager(
             $this->em,
@@ -47,19 +47,19 @@ class DoctrineTenantDatabaseManagerTest extends TestCase
     public function testListDatabasesReturnsDtos(): void
     {
         $entity1 = $this->createConfiguredMock(TenantDbConfigurationInterface::class, [
-            'getId' => 12,
+            'getId'              => 12,
             'getIdentifierValue' => 12,
-            'getDriverType' => DriverTypeEnum::MYSQL,
-            'getDbHost' => 'h',
-            'getDatabaseStatus' => DatabaseStatusEnum::DATABASE_MIGRATED,
-            'getDbPort' => 3306,
-            'getDbName' => 'db',
-            'getDbUserName' => 'u',
-            'getDbPassword' => 'p',
+            'getDriverType'      => DriverTypeEnum::MYSQL,
+            'getDbHost'          => 'h',
+            'getDatabaseStatus'  => DatabaseStatusEnum::DATABASE_MIGRATED,
+            'getDbPort'          => 3306,
+            'getDbName'          => 'db',
+            'getDbUserName'      => 'u',
+            'getDbPassword'      => 'p',
         ]);
         $this->repo->expects($this->once())
-            ->method('findBy')
-            ->willReturn([$entity1]);
+                   ->method('findBy')
+                   ->willReturn([$entity1]);
 
         $result = $this->manager->listDatabases();
         $this->assertCount(1, $result);
@@ -71,7 +71,7 @@ class DoctrineTenantDatabaseManagerTest extends TestCase
     public function testListDatabasesThrowsIfEmpty(): void
     {
         $this->repo->method('findBy')
-            ->willReturn([]);
+                   ->willReturn([]);
         $this->expectException(RuntimeException::class);
         $this->manager->listDatabases();
     }
@@ -79,18 +79,18 @@ class DoctrineTenantDatabaseManagerTest extends TestCase
     public function testListMissingDatabasesReturnsDtos(): void
     {
         $entity = $this->createConfiguredMock(TenantDbConfigurationInterface::class, [
-            'getId' => 11,
-            'getIdentifierValue' =>"Tenant ID",
-            'getDriverType' => DriverTypeEnum::MYSQL,
-            'getDatabaseStatus' => DatabaseStatusEnum::DATABASE_NOT_CREATED,
-            'getDbHost' => 'h',
-            'getDbPort' => 3306,
-            'getDbName' => 'db',
-            'getDbUserName' => 'u',
-            'getDbPassword' => 'p',
+            'getId'              => 11,
+            'getIdentifierValue' => "Tenant ID",
+            'getDriverType'      => DriverTypeEnum::MYSQL,
+            'getDatabaseStatus'  => DatabaseStatusEnum::DATABASE_NOT_CREATED,
+            'getDbHost'          => 'h',
+            'getDbPort'          => 3306,
+            'getDbName'          => 'db',
+            'getDbUserName'      => 'u',
+            'getDbPassword'      => 'p',
         ]);
         $this->repo->method('findBy')
-            ->willReturn([$entity]);
+                   ->willReturn([$entity]);
         $result = $this->manager->listMissingDatabases();
         $this->assertCount(1, $result);
         $this->assertSame('Tenant ID', $result[0]->identifier);
@@ -99,7 +99,7 @@ class DoctrineTenantDatabaseManagerTest extends TestCase
     public function testListMissingDatabasesThrowsIfEmpty(): void
     {
         $this->repo->method('findBy')
-            ->willReturn([]);
+                   ->willReturn([]);
         $this->expectException(RuntimeException::class);
         $this->manager->listMissingDatabases();
     }
@@ -107,19 +107,19 @@ class DoctrineTenantDatabaseManagerTest extends TestCase
     public function testGetDefaultTenantIDatabaseReturnsDto(): void
     {
         $entity = $this->createConfiguredMock(TenantDbConfigurationInterface::class, [
-            'getId' => 13,
+            'getId'              => 13,
             'getIdentifierValue' => 13,
-            'getDriverType' => DriverTypeEnum::MYSQL,
-            'getDbHost' => 'h',
-            'getDatabaseStatus' => DatabaseStatusEnum::DATABASE_CREATED,
-            'getDbPort' => 3306,
-            'getDbName' => 'db',
-            'getDbUserName' => 'u',
-            'getDbPassword' => 'p',
+            'getDriverType'      => DriverTypeEnum::MYSQL,
+            'getDbHost'          => 'h',
+            'getDatabaseStatus'  => DatabaseStatusEnum::DATABASE_CREATED,
+            'getDbPort'          => 3306,
+            'getDbName'          => 'db',
+            'getDbUserName'      => 'u',
+            'getDbPassword'      => 'p',
         ]);
         $this->repo->method('findOneBy')
-            ->with(['databaseStatus' => DatabaseStatusEnum::DATABASE_CREATED])
-            ->willReturn($entity);
+                   ->with(['databaseStatus' => DatabaseStatusEnum::DATABASE_CREATED])
+                   ->willReturn($entity);
         $dto = $this->manager->getDefaultTenantIDatabase();
         $this->assertSame(13, $dto->identifier);
     }
@@ -127,7 +127,7 @@ class DoctrineTenantDatabaseManagerTest extends TestCase
     public function testGetDefaultTenantIDatabaseThrowsIfNone(): void
     {
         $this->repo->method('findOneBy')
-            ->willReturn(null);
+                   ->willReturn(null);
         $this->expectException(RuntimeException::class);
         $this->manager->getDefaultTenantIDatabase();
     }
@@ -145,7 +145,7 @@ class DoctrineTenantDatabaseManagerTest extends TestCase
             password: 'p',
         );
         $this->connGen->method('generateMaintenanceConnection')
-            ->willThrowException(new Exception('err'));
+                      ->willThrowException(new Exception('err'));
         $this->expectException(MultiTenancyException::class);
         $this->manager->createTenantDatabase($dto);
     }
@@ -154,8 +154,8 @@ class DoctrineTenantDatabaseManagerTest extends TestCase
     {
         $entity = $this->createMock(TenantDbConfigurationInterface::class);
         $this->repo->method('findOneBy')
-            ->with([self::IDENTIFIER_FIELD => 130])
-            ->willReturn($entity);
+                   ->with([self::IDENTIFIER_FIELD => 130])
+                   ->willReturn($entity);
         $this->em->expects($this->once())->method('persist')->with($entity);
         $this->em->expects($this->once())->method('flush');
         $result = $this->manager->updateTenantDatabaseStatus(130, DatabaseStatusEnum::DATABASE_CREATED);
@@ -172,21 +172,21 @@ class DoctrineTenantDatabaseManagerTest extends TestCase
     public function testGetTenantDatabaseByIdReturnsDto(): void
     {
         $entity = $this->createConfiguredMock(TenantDbConfigurationInterface::class, [
-            'getId' => 42,
+            'getId'              => 42,
             'getIdentifierValue' => 42,
-            'getDriverType' => DriverTypeEnum::MYSQL,
-            'getDbHost' => 'host',
-            'getDatabaseStatus' => DatabaseStatusEnum::DATABASE_NOT_CREATED,
-            'getDbPort' => 3306,
-            'getDbName' => 'tenant_42',
-            'getDbUserName' => 'user',
-            'getDbPassword' => 'pass',
+            'getDriverType'      => DriverTypeEnum::MYSQL,
+            'getDbHost'          => 'host',
+            'getDatabaseStatus'  => DatabaseStatusEnum::DATABASE_NOT_CREATED,
+            'getDbPort'          => 3306,
+            'getDbName'          => 'tenant_42',
+            'getDbUserName'      => 'user',
+            'getDbPassword'      => 'pass',
         ]);
 
         $this->repo->expects($this->once())
-            ->method('findOneBy')
-            ->with([self::IDENTIFIER_FIELD => 42])
-            ->willReturn($entity);
+                   ->method('findOneBy')
+                   ->with([self::IDENTIFIER_FIELD => 42])
+                   ->willReturn($entity);
 
         $result = $this->manager->getTenantDatabaseById(42);
 
@@ -198,9 +198,9 @@ class DoctrineTenantDatabaseManagerTest extends TestCase
     public function testGetTenantDatabaseByIdThrowsIfNotFound(): void
     {
         $this->repo->expects($this->once())
-            ->method('findOneBy')
-            ->with([self::IDENTIFIER_FIELD => 999])
-            ->willReturn(null);
+                   ->method('findOneBy')
+                   ->with([self::IDENTIFIER_FIELD => 999])
+                   ->willReturn(null);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Tenant database with identifier "999" not found');

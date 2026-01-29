@@ -2,11 +2,11 @@
 
 namespace Hakam\MultiTenancyBundle\Tests\Unit\Adapter;
 
-use Hakam\MultiTenancyBundle\Enum\DatabaseStatusEnum;
-use PHPUnit\Framework\TestCase;
 use Hakam\MultiTenancyBundle\Adapter\DefaultDsnGenerator;
 use Hakam\MultiTenancyBundle\Config\TenantConnectionConfigDTO;
+use Hakam\MultiTenancyBundle\Enum\DatabaseStatusEnum;
 use Hakam\MultiTenancyBundle\Enum\DriverTypeEnum;
+use PHPUnit\Framework\TestCase;
 
 class DefaultDsnGeneratorTest extends TestCase
 {
@@ -23,7 +23,7 @@ class DefaultDsnGeneratorTest extends TestCase
     public function provideGenerate(): array
     {
         return [
-            'mysql with password' => [
+            'mysql with password'       => [
                 TenantConnectionConfigDTO::fromArgs(
                     identifier: 11,
                     driver: DriverTypeEnum::MYSQL,
@@ -34,9 +34,9 @@ class DefaultDsnGeneratorTest extends TestCase
                     user: 'foo',
                     password: 'bar'
                 ),
-                'mysql://foo:bar@example.com:3306/db1'
+                'mysql://foo:bar@example.com:3306/db1',
             ],
-            'mysql without password' => [
+            'mysql without password'    => [
                 TenantConnectionConfigDTO::fromArgs(
                     identifier: 12,
                     driver: DriverTypeEnum::MYSQL,
@@ -47,9 +47,9 @@ class DefaultDsnGeneratorTest extends TestCase
                     user: 'user',
                     password: null
                 ),
-                'mysql://user@host:3307/testdb'
+                'mysql://user@host:3307/testdb',
             ],
-            'postgres with password' => [
+            'postgres with password'    => [
                 TenantConnectionConfigDTO::fromArgs(
                     identifier: 13,
                     driver: DriverTypeEnum::POSTGRES,
@@ -60,7 +60,7 @@ class DefaultDsnGeneratorTest extends TestCase
                     user: 'pguser',
                     password: 'pgpass'
                 ),
-                'pgsql://pguser:pgpass@pg.example.org:5432/pgdb'
+                'pgsql://pguser:pgpass@pg.example.org:5432/pgdb',
             ],
             'postgres without password' => [
                 TenantConnectionConfigDTO::fromArgs(
@@ -73,9 +73,9 @@ class DefaultDsnGeneratorTest extends TestCase
                     user: 'admin',
                     password: null
                 ),
-                'pgsql://admin@localhost:5433/otherdb'
+                'pgsql://admin@localhost:5433/otherdb',
             ],
-            'sqlite absolute path' => [
+            'sqlite absolute path'      => [
                 TenantConnectionConfigDTO::fromArgs(
                     identifier: 15,
                     driver: DriverTypeEnum::SQLITE,
@@ -86,9 +86,9 @@ class DefaultDsnGeneratorTest extends TestCase
                     user: '',
                     password: null
                 ),
-                'sqlite:///data/tenant.sqlite'
+                'sqlite:///data/tenant.sqlite',
             ],
-            'sqlite relative path' => [
+            'sqlite relative path'      => [
                 TenantConnectionConfigDTO::fromArgs(
                     identifier: 16,
                     driver: DriverTypeEnum::SQLITE,
@@ -99,7 +99,7 @@ class DefaultDsnGeneratorTest extends TestCase
                     user: '',
                     password: null
                 ),
-                'sqlite:///tenant.sqlite'
+                'sqlite:///tenant.sqlite',
             ],
         ];
     }
@@ -119,7 +119,7 @@ class DefaultDsnGeneratorTest extends TestCase
     public function provideGenerateMaintenance(): array
     {
         return [
-            'mysql maintenance' => [
+            'mysql maintenance'           => [
                 TenantConnectionConfigDTO::fromArgs(
                     identifier: 11,
                     driver: DriverTypeEnum::MYSQL,
@@ -130,9 +130,9 @@ class DefaultDsnGeneratorTest extends TestCase
                     user: 'foo',
                     password: 'bar'
                 ),
-                'mysql://foo:bar@example.com:3306'
+                'mysql://foo:bar@example.com:3306',
             ],
-            'postgres maintenance' => [
+            'postgres maintenance'        => [
                 TenantConnectionConfigDTO::fromArgs(
                     identifier: 12,
                     driver: DriverTypeEnum::POSTGRES,
@@ -143,7 +143,7 @@ class DefaultDsnGeneratorTest extends TestCase
                     user: 'pguser',
                     password: 'pgpass'
                 ),
-                'pgsql://pguser:pgpass@pg.example.org:5432/postgres'
+                'pgsql://pguser:pgpass@pg.example.org:5432/postgres',
             ],
             'sqlite maintenance absolute' => [
                 TenantConnectionConfigDTO::fromArgs(
@@ -156,7 +156,7 @@ class DefaultDsnGeneratorTest extends TestCase
                     user: '',
                     password: null
                 ),
-                'sqlite:///data/tenant.sqlite'
+                'sqlite:///data/tenant.sqlite',
             ],
         ];
     }

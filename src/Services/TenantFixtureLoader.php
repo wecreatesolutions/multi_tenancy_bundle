@@ -12,7 +12,7 @@ use Traversable;
 final class TenantFixtureLoader
 {
     public function __construct(
-        #[AutowireIterator('tenant_fixture')]private readonly iterable $fixtures
+        #[AutowireIterator('tenant_fixture')] private readonly iterable $fixtures
     )
     {
     }

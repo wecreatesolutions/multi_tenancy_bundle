@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Hakam\MultiTenancyBundle\Services;
 
 use Hakam\MultiTenancyBundle\Enum\DatabaseStatusEnum;
@@ -13,7 +15,7 @@ interface TenantDbConfigurationInterface
     /**
      * Tenant database id.
      */
-    public function getId(): ?int;
+    public function getId(): mixed;
 
     /**
      * Tenant database name.
@@ -51,7 +53,7 @@ interface TenantDbConfigurationInterface
     public function setDatabaseStatus(DatabaseStatusEnum $databaseStatus): self;
 
     public function getDsnUrl(): string;
-    
+
     public function getDriverType(): DriverTypeEnum;
 
     /**

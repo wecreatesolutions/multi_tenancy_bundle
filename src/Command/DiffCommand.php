@@ -18,8 +18,8 @@ class DiffCommand extends TenantCommand
 {
 
     public function __construct(
-        private readonly ManagerRegistry          $registry,
-        private readonly ContainerInterface       $container,
+        private readonly ManagerRegistry $registry,
+        private readonly ContainerInterface $container,
         private readonly EventDispatcherInterface $eventDispatcher,
     )
     {
