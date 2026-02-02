@@ -4,6 +4,7 @@ namespace Hakam\MultiTenancyBundle\Config;
 
 use Hakam\MultiTenancyBundle\Enum\DatabaseStatusEnum;
 use Hakam\MultiTenancyBundle\Enum\DriverTypeEnum;
+use Hakam\MultiTenancyBundle\Services\TenantDbConfigurationInterface;
 
 /**
  * @author Ramy Hakam <pencilsoft1@gmail.com
@@ -21,6 +22,20 @@ class TenantConnectionConfigDTO
         public ?string $password = null
     )
     {
+    }
+
+    public static function fromTenantDbConfiguration(TenantDbConfigurationInterface $tenantDbConfig): self
+    {
+        return self::fromArgs(
+            identifier: $tenantDbConfig->getIdentifierValue() ?? null,
+            driver: $tenantDbConfig->getDriverType(),
+            dbStatus: $tenantDbConfig->getDatabaseStatus(),
+            host: $tenantDbConfig->getDbHost(),
+            port: $tenantDbConfig->getDbPort(),
+            dbname: $tenantDbConfig->getDbName(),
+            user: $tenantDbConfig->getDbUserName(),
+            password: $tenantDbConfig->getDbPassword()
+        );
     }
 
     public static function fromArgs(

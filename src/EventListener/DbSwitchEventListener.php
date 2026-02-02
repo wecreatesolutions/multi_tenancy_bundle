@@ -2,6 +2,7 @@
 
 namespace Hakam\MultiTenancyBundle\EventListener;
 
+use Hakam\MultiTenancyBundle\Config\TenantConnectionConfigDTO;
 use Hakam\MultiTenancyBundle\Doctrine\ORM\TenantEntityManager;
 use Hakam\MultiTenancyBundle\Event\SwitchDbEvent;
 use Hakam\MultiTenancyBundle\Port\TenantConfigProviderInterface;
@@ -13,7 +14,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class DbSwitchEventListener implements EventSubscriberInterface
 {
-
     public function __construct(
         private readonly ContainerInterface $container,
         private readonly TenantConfigProviderInterface $tenantConfigProvider,
@@ -33,8 +33,15 @@ class DbSwitchEventListener implements EventSubscriberInterface
 
     public function onHakamMultiTenancyBundleEventSwitchDbEvent(SwitchDbEvent $switchDbEvent): void
     {
-        $tenantDbConfigDTO = $this->tenantConfigProvider->getTenantConnectionConfig($switchDbEvent->getDbIndex());
-        $tenantConnection  = $this->container->get('doctrine')->getConnection('tenant');
+        $tenant = $switchDbEvent->getTenantDbConfiguration();
+
+        if ($tenant === null) {
+            $tenantDbConfigDTO = $this->tenantConfigProvider->getTenantConnectionConfig($switchDbEvent->getDbIndex());
+        } else {
+            $tenantDbConfigDTO = TenantConnectionConfigDTO::fromTenantDbConfiguration($tenant);
+        }
+
+        $tenantConnection = $this->container->get('doctrine')->getConnection('tenant');
 
         $params = [
             'dbname'   => $tenantDbConfigDTO->dbname,

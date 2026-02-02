@@ -49,8 +49,8 @@ final class CreateDatabaseCommand extends Command
 
                 return 1;
             }
-            if ($dbId) {
-                return $this->createDatabaseById((int)$dbId, $output);
+            if (is_string($dbId)) {
+                return $this->createDatabaseById($dbId, $output);
             }
 
             return $this->createAllMissingDatabases($output);
@@ -102,14 +102,14 @@ final class CreateDatabaseCommand extends Command
             }
             $databaseCreated = $this->createDatabase($dbConfig, $output);
             if (!$databaseCreated) {
-                throw new MultiTenancyException(sprintf('Failed to create database %s for tenant ID %d', $dbConfig->dbname, $dbId));
+                throw new MultiTenancyException(sprintf('Failed to create database %s for tenant ID %s', $dbConfig->dbname, $dbId));
             }
-            $output->writeln(sprintf('Database %s created successfully for tenant ID %d', $dbConfig->dbname, $dbId));
+            $output->writeln(sprintf('Database %s created successfully for tenant ID %s', $dbConfig->dbname, $dbId));
             $this->tenantDatabaseManager->updateTenantDatabaseStatus($dbId, DatabaseStatusEnum::DATABASE_CREATED);
 
             return 0;
         } catch (Exception $e) {
-            $output->writeln(sprintf('Failed to create database for tenant ID %d: %s', $dbId, $e->getMessage()));
+            $output->writeln(sprintf('Failed to create database for tenant ID %s: %s', $dbId, $e->getMessage()));
 
             return 1;
         }
