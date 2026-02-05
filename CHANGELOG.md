@@ -1,3 +1,6 @@
+# v2.9.3.4
+* DoctrineTenantDatabaseManager - fix lazy repository init to prevent DoctrineMetadataCacheWarmer failure in no-debug warmup
+
 # v2.9.3.3
 * SwitchDbEvent – allow to set tenant entity
 * CreateDatabaseCommand – allow identifier to be string
